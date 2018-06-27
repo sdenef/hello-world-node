@@ -36,3 +36,15 @@ jobs:
       - run: 
           name: Execute Nodejs Unit tests
           command: npm test
+
+      # Remove .git directory so that source2image use binary files
+      - run: rm -rf .git
+
+      # Remove unnecessary files
+      - run: rm -rf screens README.md tests .gitignore .circleci
+
+      - deploy: 
+          command: |
+              oc login -u ${CLUSTER_USERNAME} -p ${CLUSTER_PASSWORD} ${CLUSTER_URL} --insecure-skip-tls-verify=true
+              oc project ${PROJECT_NAME}
+              oc start-build ${APP_NAME} --from-dir=.
